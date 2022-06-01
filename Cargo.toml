@@ -7,7 +7,11 @@ license = "MIT-0"
 repository = "https://github.com/iliana/form-data-builder"
 keywords = ["multipart", "form-data", "rfc7578"]
 categories = ["encoding"]
+exclude = [".gitignore", "testdata"]
 
 [dependencies]
 base64 = "0.13"
 rand = "0.8"
+
+[package.metadata.docs.rs]
+targets = []
