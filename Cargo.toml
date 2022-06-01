@@ -1,0 +1,13 @@
+[package]
+name = "form-data-builder"
+version = "1.0.0"
+edition = "2021"
+description = "Simple multipart/form-data (RFC 7578) document builder"
+license = "MIT-0"
+repository = "https://github.com/iliana/form-data-builder"
+keywords = ["multipart", "form-data", "rfc7578"]
+categories = ["encoding"]
+
+[dependencies]
+base64 = "0.13"
+rand = "0.8"

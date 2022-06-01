@@ -1,0 +1,1 @@
+Should you wish a long and happy career of writing Rust programs, you should turn back now and forget you ever saw this book. It is not necessary. However if you intend to write unsafe code — or just want to dig into the guts of the language — this book contains lots of useful information.
