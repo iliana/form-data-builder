@@ -24,7 +24,7 @@
 use rand::{thread_rng, RngCore};
 use std::ffi::OsStr;
 use std::fs::File;
-use std::io::{Cursor, Error, ErrorKind, Read, Result, Write};
+use std::io::{Error, ErrorKind, Read, Result, Write};
 use std::path::Path;
 use std::time::SystemTime;
 
@@ -53,25 +53,16 @@ impl<W: Write> FormData<W> {
     /// Panics if the random number generator fails or if the current system time is prior to the
     /// Unix epoch.
     pub fn new(writer: W) -> FormData<W> {
-        let mut buf = Cursor::new([0; 24]);
+        let mut buf = [0; 24];
 
-        // Write the current system time
         let now = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .expect("system time should be after the Unix epoch");
-        buf.write_all(&now.subsec_nanos().to_ne_bytes()).unwrap();
-        buf.write_all(&now.as_secs().to_ne_bytes()).unwrap();
+        (&mut buf[..4]).copy_from_slice(&now.subsec_nanos().to_ne_bytes());
+        (&mut buf[4..12]).copy_from_slice(&now.as_secs().to_ne_bytes());
+        thread_rng().fill_bytes(&mut buf[12..]);
 
-        // Fill the rest of the buffer with random bytes
-        #[allow(clippy::cast_possible_truncation)]
-        let pos = buf.position() as usize;
-        thread_rng().fill_bytes(&mut buf.get_mut()[pos..]);
-
-        // Encode and pad with hyphens
-        let boundary = format!(
-            "{:->68}",
-            base64::encode_config(buf.get_ref(), base64::URL_SAFE)
-        );
+        let boundary = format!("{:->68}", base64::encode_config(&buf, base64::URL_SAFE));
 
         FormData {
             writer: Some(writer),
@@ -257,6 +248,8 @@ mod tests {
             include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/testdata/text-b.txt"));
 
         let mut form = FormData::new(Vec::new());
+        assert_eq!(form.boundary.len(), 68);
+        assert_eq!(form.boundary[..(36)], "-".repeat(36));
         // cheat and use the boundary Firefox generated
         form.boundary = "---------------------------20598614689265574691413388431".to_owned();
 

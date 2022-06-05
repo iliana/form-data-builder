@@ -1,6 +1,6 @@
 [package]
 name = "form-data-builder"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 description = "Simple multipart/form-data (RFC 7578) document builder"
 license = "MIT-0"
